@@ -6,7 +6,6 @@ import { Button } from "../button";
 import { Home, User as UserIcon, LogOut } from "lucide-react";
 import { ButtonTheme } from "../theme";
 import { usePathname } from "next/navigation";
-import clsx from "clsx";
 
 export function Header() {
   const pathname = usePathname();
@@ -37,10 +36,12 @@ export function Header() {
         <div className={style.l_s}>
           <ButtonTheme />
           <span>Olá, elias_silva</span>
-          <button className={style.l}>
-            <LogOut size="17" />
-            Sair
-          </button>
+          <Link href="/auth">
+            <button className={style.l}>
+              <LogOut size="17" />
+              Sair
+            </button>
+          </Link>
         </div>
       </header>
     </>
