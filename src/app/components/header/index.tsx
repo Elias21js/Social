@@ -3,12 +3,34 @@
 import Link from "next/link";
 import style from "./header.module.css";
 import { Button } from "../button";
+
 import { Home, User as UserIcon, LogOut } from "lucide-react";
 import { ButtonTheme } from "../theme";
 import { usePathname } from "next/navigation";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useNotyf } from "@/utils/toast/notyf";
 
 export function Header() {
+  const router = useRouter();
   const pathname = usePathname();
+  const notyf = useNotyf();
+
+  const handleLogOut = async () => {
+    try {
+      const {
+        data: { success },
+      } = await axios.post(process.env.NEXT_PUBLIC_API_URL + "/logout");
+
+      if (success) {
+        notyf?.success("Deslogado com sucesso.");
+        return router.push("/auth");
+      }
+    } catch (err) {
+      console.error(err);
+      notyf?.error("Ocorreu um erro interno.");
+    }
+  };
 
   return (
     <>
@@ -37,7 +59,7 @@ export function Header() {
           <ButtonTheme />
           <span>Olá, elias_silva</span>
           <Link href="/auth">
-            <button className={style.l}>
+            <button className={style.l} onClick={handleLogOut}>
               <LogOut size="17" />
               Sair
             </button>

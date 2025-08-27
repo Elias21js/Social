@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "notyf/notyf.min.css";
 import { HeaderWrapper } from "./components/header/HeaderWrapper";
 
 export const metadata: Metadata = {
