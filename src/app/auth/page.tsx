@@ -7,8 +7,11 @@ import ConfirmSignup from "./confirm";
 import { RegisterResponse } from "@/utils/interfaces/interfaces";
 import { useRouter } from "next/navigation";
 import { useNotyf } from "@/utils/toast/notyf";
+import { getErrorMessage } from "@/utils/error/errorCatch";
+import { useLoading } from "@/utils/loading/loadingContext";
 
 export default function Auth() {
+  const { setLoading } = useLoading();
   const notyf = useNotyf();
   const router = useRouter();
   const [registered, setRegistered] = useState<boolean>(false);
@@ -28,32 +31,54 @@ export default function Auth() {
     if (!form.name && submited === "register") return notyf?.error("Você deve inserir um nome válido.");
 
     if (submited === "register") {
-      const { data } = await axios.post<RegisterResponse>(process.env.NEXT_PUBLIC_API_URL + "/register", {
-        name: form.name,
-        email: form.email,
-        password: form.password,
-      });
+      try {
+        setLoading(true);
+        const { data } = await axios.post<RegisterResponse>(process.env.NEXT_PUBLIC_API_URL + "/register", {
+          name: form.name,
+          email: form.email,
+          password: form.password,
+        });
 
-      if (data.success) {
-        notyf?.success("Usuário registrado com sucesso.");
-        return setRegistered(true);
-      } else {
-        notyf?.error("Ocorreu um erro ao registrar este usuário.");
+        if (data.success) {
+          notyf?.success("Usuário registrado com sucesso.");
+          setLoading(false);
+          return setRegistered(true);
+        }
+      } catch (err: unknown) {
+        notyf?.error(getErrorMessage(err));
+        setLoading(false);
         return setRegistered(false);
       }
     } else if (submited === "login") {
-      const {
-        data: { success },
-      } = await axios.post<RegisterResponse>(process.env.NEXT_PUBLIC_API_URL + "/login", {
-        email: form.email,
-        password: form.password,
-      });
+      try {
+        setLoading(true);
+        const {
+          data: { success },
+        } = await axios.post<RegisterResponse>(process.env.NEXT_PUBLIC_API_URL + "/login", {
+          email: form.email,
+          password: form.password,
+        });
 
-      if (success) {
-        notyf?.success("Logado com sucesso.");
-        router.push("/");
-      } else {
-        notyf?.error("Ocorreu um erro no login.");
+        if (success) {
+          notyf?.success("Logado com sucesso.");
+          router.push("/");
+          setLoading(false);
+        }
+      } catch (err: unknown) {
+        if (getErrorMessage(err) === "Email not confirmed") {
+          try {
+            await axios.post(process.env.NEXT_PUBLIC_API_URL + "/login-otp", { email: form.email });
+            notyf?.success("Confirme no seu e-mail para efetuar o login.");
+            setLoading(false);
+            return setRegistered(true);
+          } catch (err) {
+            setLoading(false);
+            notyf?.error(getErrorMessage(err));
+          }
+        } else {
+          setLoading(false);
+          notyf?.error(getErrorMessage(err));
+        }
       }
     }
   };

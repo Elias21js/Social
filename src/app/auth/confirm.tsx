@@ -5,6 +5,7 @@ import style from "./confirm.module.css";
 import axios, { AxiosError } from "axios";
 import { Notyf } from "notyf";
 import { useRouter } from "next/navigation";
+import { useLoading } from "@/utils/loading/loadingContext";
 
 interface ConfirmSignupProps {
   email: string;
@@ -14,6 +15,7 @@ interface ConfirmSignupProps {
 
 export default function ConfirmSignup({ email, name, notify }: ConfirmSignupProps) {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const { setLoading } = useLoading();
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
   const router = useRouter();
 
@@ -54,6 +56,7 @@ export default function ConfirmSignup({ email, name, notify }: ConfirmSignupProp
     e.preventDefault();
     const token = code.join("");
     try {
+      setLoading(true);
       const response = await axios.post<SignupResponse>(process.env.NEXT_PUBLIC_API_URL + "/confirm-otp", {
         email,
         token,
@@ -63,10 +66,12 @@ export default function ConfirmSignup({ email, name, notify }: ConfirmSignupProp
       const { success, session } = response.data;
 
       if (success) notify?.success("Código confirmado e sessão iniciada.");
+      setLoading(false);
       router.push("/");
       return;
     } catch (error) {
       const err = error as AxiosError<{ error: string; success: boolean }>;
+      setLoading(false);
       console.log(err);
       return notify?.error(err.response?.data.error ?? "Erro interno.");
     }
@@ -75,7 +80,7 @@ export default function ConfirmSignup({ email, name, notify }: ConfirmSignupProp
   return (
     <div className={style.container}>
       <div className={style.card}>
-        <h1 className={style.logo}>SociaL</h1>
+        <h1 className={style.logo}>Social</h1>
         <p className={style.subtitle}>Digite o código enviado para seu email 📩</p>
 
         <form onSubmit={(e) => handleSubmit(e)} className={style.form}>

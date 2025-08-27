@@ -10,25 +10,33 @@ import { usePathname } from "next/navigation";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useNotyf } from "@/utils/toast/notyf";
+import { getErrorMessage } from "@/utils/error/errorCatch";
+import { useLoading } from "@/utils/loading/loadingContext";
 
 export function Header() {
+  const { setLoading } = useLoading();
   const router = useRouter();
   const pathname = usePathname();
   const notyf = useNotyf();
 
   const handleLogOut = async () => {
     try {
+      setLoading(true);
       const {
         data: { success },
       } = await axios.post(process.env.NEXT_PUBLIC_API_URL + "/logout");
 
       if (success) {
         notyf?.success("Deslogado com sucesso.");
+        setLoading(false);
+
         return router.push("/auth");
       }
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
-      notyf?.error("Ocorreu um erro interno.");
+      setLoading(false);
+
+      notyf?.error(getErrorMessage(err));
     }
   };
 
