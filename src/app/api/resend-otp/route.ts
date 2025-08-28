@@ -1,4 +1,4 @@
-import { supabase } from "@/app/lib/supabaseClient";
+import { createClient } from "@/utils/supabaseServer/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -7,6 +7,7 @@ export async function POST(req: NextRequest) {
 
     if (!email) return NextResponse.json({ error: "Email obrigatório", success: false }, { status: 400 });
 
+    const supabase = await createClient();
     const { data, error } = await supabase.auth.signUp({
       email,
       password: "qualquerSenhaTemporaria123",

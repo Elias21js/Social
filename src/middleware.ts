@@ -1,37 +1,31 @@
-import { NextResponse } from "next/server";
-import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { updateSession } from "./utils/supabaseMiddleware/middleware";
+
+export async function sessionMiddleware(request: NextRequest) {
+  return await updateSession(request);
+}
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
-  const supabase = createMiddlewareClient({ req, res });
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  // executa em ordem
+  const middlewares = [sessionMiddleware];
 
-  const { pathname } = req.nextUrl;
-
-  console.log("➡️ pathname:", pathname);
-  console.log("➡️ session:", session);
-
-  if (!session && ["/", "/perfil"].includes(pathname)) {
-    return NextResponse.redirect(new URL("/auth", req.url));
-  }
-
-  if (session && pathname.startsWith("/auth")) {
-    return NextResponse.redirect(new URL("/", req.url));
-  }
-
-  if (session) {
-    res.headers.set("x-user-id", session.user.id);
-    console.log(session.user.id);
+  for (const mw of middlewares) {
+    const result = await mw(req);
+    if (result instanceof NextResponse) {
+      return result; // se um middleware "interceptar", encerra
+    }
   }
 
   return res;
 }
 
-// rotas que o middleware vai checar
 export const config = {
-  matcher: ["/", "/perfil", "/auth"],
+  matcher: [
+    "/",
+    "/perfil",
+    "/auth",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };

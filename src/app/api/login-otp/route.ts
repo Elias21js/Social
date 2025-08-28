@@ -1,10 +1,11 @@
-import { supabase } from "@/app/lib/supabaseClient";
+import { createClient } from "@/utils/supabaseServer/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const { email } = body;
 
+  const supabase = await createClient();
   const { error } = await supabase.auth.signInWithOtp({
     email,
   });

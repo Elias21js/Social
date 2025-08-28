@@ -1,6 +1,6 @@
 // src/app/api/auth/confirm-otp/route.ts
 import { NextResponse } from "next/server";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/utils/supabaseServer/server";
 import type { NextRequest } from "next/server";
 import { cookies } from "next/headers";
 import { createUserProfile } from "@/app/lib/userModel";
@@ -8,7 +8,7 @@ import { createUserProfile } from "@/app/lib/userModel";
 export async function POST(req: NextRequest) {
   const { email, token, name } = await req.json();
 
-  const supabase = createRouteHandlerClient({ cookies });
+  const supabase = await createClient();
 
   // verifica OTP e loga automaticamente
   const { data, error: verifyError } = await supabase.auth.verifyOtp({

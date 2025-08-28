@@ -1,6 +1,6 @@
-import { supabase } from "@/app/lib/supabaseClient";
 import { userSchema } from "@/utils/joi/userSchema";
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/utils/supabaseServer/server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,6 +8,8 @@ export async function POST(req: NextRequest) {
 
     const { value, error } = userSchema.validate(body);
     const { name, email, password } = value;
+
+    const supabase = await createClient();
 
     const { data, error: errSignup } = await supabase.auth.signUp({
       email,
