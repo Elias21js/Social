@@ -1,0 +1,45 @@
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.129);
+  border: 2px solid transparent;
+  border-radius: 0.8rem;
+  width: 100%;
+  cursor: text;
+}
+
+.container:focus-within {
+  border: 2px solid var(--purple-primary);
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  background-color: var(--purple-primary);
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.tag span {
+  margin-left: 0.4rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.input {
+  flex: 1;
+  min-width: 120px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--foreground);
+  font-size: 1rem;
+}
+
+.input::placeholder {
+  color: var(--foreground-placeholder);
+}

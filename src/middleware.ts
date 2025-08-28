@@ -23,6 +23,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/", req.url));
   }
 
+  if (session) {
+    res.headers.set("x-user-id", session.user.id);
+    console.log(session.user.id);
+  }
+
   return res;
 }
 

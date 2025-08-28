@@ -6,10 +6,17 @@ import Image from "next/image";
 import { RefreshCw, Image as ImageIcon, Send } from "lucide-react";
 import { Button } from "../button";
 import { useEffect, useRef, useState } from "react";
+import KeywordsInput from "../keywords";
+import { useNotyf } from "@/utils/toast/notyf";
+import { getErrorMessage } from "@/utils/error/errorCatch";
+import { handleAddPost } from "@/app/controllers/postController";
 
 export function Post() {
   const publicRef = useRef<HTMLButtonElement | null>(null);
+  const imageURL = useRef<HTMLInputElement | null>(null);
   const resetRef = useRef<HTMLButtonElement | null>(null);
+  const notyf = useNotyf();
+  const [keywords, setKeywords] = useState<string[]>([]);
   const [state, setState] = useState<string>("");
   const [txtCount, setTxtCount] = useState<number>(0);
 
@@ -27,6 +34,18 @@ export function Post() {
 
   const reset = () => {
     setState("");
+  };
+
+  const handleNewPost = async () => {
+    try {
+      const success = await handleAddPost({ content: state, image: imageURL?.current?.value, keywords });
+      console.log(state, imageURL?.current?.value, keywords);
+      if (success) notyf?.success("Post adicionado com sucesso.");
+      else notyf?.error("Ocorreu um erro interno");
+    } catch (err) {
+      console.error(err);
+      notyf?.error(getErrorMessage(err));
+    }
   };
 
   return (
@@ -50,22 +69,25 @@ export function Post() {
             className={style.t_a}
             name="post_content"
             id="post_content"
+            spellCheck="false"
             placeholder="O que você está pensando?"
           />
           <input
             className={style.url_i}
             type="text"
+            ref={imageURL}
             placeholder="URL da imagem (opcional)"
             name="url"
             id="url"
             autoComplete="off"
           />
+          <KeywordsInput onChange={setKeywords} />
           <div className={style.p_s}>
             <Button className={style.b_img_ch} ref={resetRef} onClick={reset}>
               <ImageIcon size="18" />
               <span>{txtCount}/280</span>
             </Button>
-            <Button ref={publicRef} disabled selected>
+            <Button ref={publicRef} selected onClick={handleNewPost}>
               <Send size="18" />
               <span>Publicar</span>
             </Button>
