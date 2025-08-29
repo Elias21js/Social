@@ -26,6 +26,7 @@ export async function getAllPosts(limit = 5) {
 
 interface PostModel extends postBody {
   user_id: string;
+  image: string;
 }
 
 export async function addPost({ user_id, content, image, keywords }: PostModel) {
