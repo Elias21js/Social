@@ -2,8 +2,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { cookies } from "next/headers";
-import { createUserProfile } from "@/app/lib/userModel";
 import { createServerClient } from "@supabase/ssr";
+import { createUserProfile } from "@/app/models/users.models";
 
 export async function POST(req: NextRequest) {
   const { email, token, name } = await req.json();
