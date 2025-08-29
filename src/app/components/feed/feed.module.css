@@ -74,6 +74,8 @@
     & .author_posted {
       color: rgba(var(--foreground-a), 0.5);
       font-size: 0.75rem;
+      align-self: flex-start;
+      margin-top: 0.6rem;
       background-color: rgba(var(--foreground-a), 0.1);
       border: 0.1px solid rgba(var(--foreground-a), 0.2);
       padding: 0.1rem 0.5rem;
@@ -87,12 +89,13 @@
   }
 
   & .post_image {
-    position: relative;
     width: 100%;
-    height: 20rem;
+    height: max-content;
     border-bottom: 1px solid rgba(var(--foreground-a), 0.2);
 
     img {
+      width: 100%;
+      height: 100%;
       border-radius: 0.8rem;
       object-fit: cover;
       padding-bottom: 1rem;

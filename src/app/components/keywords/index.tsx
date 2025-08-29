@@ -1,11 +1,15 @@
-import { useState, useRef, KeyboardEvent, ChangeEvent } from "react";
+import { useState, useRef, KeyboardEvent, ChangeEvent, forwardRef, useImperativeHandle } from "react";
 import style from "./keywords.module.css";
 
 interface KeywordsInputProps {
   onChange?: (tags: string[]) => void;
 }
 
-export default function KeywordsInput({ onChange }: KeywordsInputProps) {
+export interface KeywordsInputHandle {
+  reset: () => void; // função que o pai poderá chamar
+}
+
+const KeywordsInput = forwardRef<KeywordsInputHandle, KeywordsInputProps>(({ onChange }, ref) => {
   const [tags, setTags] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -15,7 +19,7 @@ export default function KeywordsInput({ onChange }: KeywordsInputProps) {
     if (trimmed && !tags.includes(trimmed)) {
       const newTags = [...tags, trimmed];
       setTags(newTags);
-      onChange?.(newTags); // retorna array final
+      onChange?.(newTags);
     }
   };
 
@@ -39,6 +43,15 @@ export default function KeywordsInput({ onChange }: KeywordsInputProps) {
     setInputValue(e.target.value);
   };
 
+  // ✅ expõe a função reset para o pai
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      setTags([]);
+      setInputValue("");
+      onChange?.([]);
+    },
+  }));
+
   return (
     <div className={style.container} onClick={() => inputRef.current?.focus()}>
       {tags.map((tag, index) => (
@@ -58,4 +71,6 @@ export default function KeywordsInput({ onChange }: KeywordsInputProps) {
       />
     </div>
   );
-}
+});
+
+export default KeywordsInput;

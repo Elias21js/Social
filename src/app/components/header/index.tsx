@@ -11,10 +11,12 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useNotyf } from "@/utils/toast/notyf";
 import { getErrorMessage } from "@/utils/error/errorCatch";
-import { useLoading } from "@/utils/loading/loadingContext";
+import { useLoading } from "@/app/contexts/loading/loadingContext";
+import { useUser } from "@/app/contexts/UserContext";
 
 export function Header() {
   const { setLoading } = useLoading();
+  const { user } = useUser();
   const router = useRouter();
   const pathname = usePathname();
   const notyf = useNotyf();
@@ -28,9 +30,9 @@ export function Header() {
 
       if (success) {
         notyf?.success("Deslogado com sucesso.");
-        setLoading(false);
 
-        return router.push("/auth");
+        router.push("/auth");
+        setTimeout(() => setLoading(false), 500);
       }
     } catch (err: unknown) {
       console.error(err);
@@ -65,7 +67,7 @@ export function Header() {
         </div>
         <div className={style.l_s}>
           <ButtonTheme />
-          <span>Olá, elias_silva</span>
+          <span>Olá, {user?.name}</span>
           <Link href="/auth">
             <button className={style.l} onClick={handleLogOut}>
               <LogOut size="17" />

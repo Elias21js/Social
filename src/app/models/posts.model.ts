@@ -3,7 +3,21 @@ import database from "../lib/db";
 
 export async function getAllPosts(limit = 5) {
   try {
-    const { rows } = await database.query("SELECT * FROM posts LIMIT $1", [limit]);
+    const { rows } = await database.query(
+      `
+    SELECT 
+      posts.*, 
+      profiles.name AS user_name,
+      auth.users.email AS user_email,
+      profiles.avatar AS user_avatar
+    FROM posts
+    JOIN auth.users ON posts.user_id = auth.users.id
+    JOIN profiles ON posts.user_id = profiles.user_id
+    ORDER BY posts.created_at DESC
+    LIMIT $1;
+      `,
+      [limit]
+    );
     return rows;
   } catch (err) {
     throw err;

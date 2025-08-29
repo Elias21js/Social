@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "notyf/notyf.min.css";
 import { HeaderWrapper } from "./components/header/HeaderWrapper";
-import { LoadingProvider } from "@/utils/loading/loadingContext";
+import { LoadingProvider } from "@/app/contexts/loading/loadingContext";
+import { UserProvider } from "./contexts/UserContext";
 
 export const metadata: Metadata = {
   title: "Social • Sua Rede Privada",
@@ -38,8 +39,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-br">
       <body>
         <LoadingProvider>
-          <HeaderWrapper />
-          <main>{children}</main>
+          <UserProvider>
+            <HeaderWrapper />
+            <main>{children}</main>
+          </UserProvider>
         </LoadingProvider>
       </body>
     </html>

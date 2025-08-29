@@ -45,5 +45,9 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  if (user) {
+    supabaseResponse.headers.set("x-user-id", user.sub);
+  }
+
   return supabaseResponse;
 }

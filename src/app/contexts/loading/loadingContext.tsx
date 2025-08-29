@@ -1,33 +1,25 @@
 "use client";
 import { createContext, useContext, useState, ReactNode } from "react";
-import { CursorLoader } from "./cursorLoader";
+import style from "./loading.module.css";
 
 type LoadingContextType = {
   loading: boolean;
   setLoading: (value: boolean) => void;
-  cursorLoading: boolean;
-  setCursorLoading: (value: boolean) => void;
 };
 
 const LoadingContext = createContext<LoadingContextType | undefined>(undefined);
 
 export function LoadingProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
-  const [cursorLoading, setCursorLoading] = useState(false);
 
   return (
-    <LoadingContext.Provider value={{ loading, setLoading, cursorLoading, setCursorLoading }}>
+    <LoadingContext.Provider value={{ loading, setLoading }}>
       {children}
-
-      {/* Loader central */}
       {loading && (
-        <div className="loader-container">
-          <div className="loader"></div>
+        <div className={style.loader_container}>
+          <div className={style.loader}></div>
         </div>
       )}
-
-      {/* Loader no cursor */}
-      {cursorLoading && <CursorLoader />}
     </LoadingContext.Provider>
   );
 }

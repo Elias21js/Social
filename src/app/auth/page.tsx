@@ -8,10 +8,12 @@ import { RegisterResponse } from "@/utils/interfaces/interfaces";
 import { useRouter } from "next/navigation";
 import { useNotyf } from "@/utils/toast/notyf";
 import { getErrorMessage } from "@/utils/error/errorCatch";
-import { useLoading } from "@/utils/loading/loadingContext";
+import { useLoading } from "@/app/contexts/loading/loadingContext";
+import { useUser } from "../contexts/UserContext";
 
 export default function Auth() {
   const { setLoading } = useLoading();
+  const { refreshUser } = useUser();
   const notyf = useNotyf();
   const router = useRouter();
   const [registered, setRegistered] = useState<boolean>(false);
@@ -62,7 +64,8 @@ export default function Auth() {
         if (success) {
           notyf?.success("Logado com sucesso.");
           router.push("/");
-          setLoading(false);
+          await refreshUser();
+          setTimeout(() => setLoading(false), 500);
         }
       } catch (err: unknown) {
         if (getErrorMessage(err) === "Email not confirmed") {

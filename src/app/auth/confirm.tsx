@@ -5,7 +5,7 @@ import style from "./confirm.module.css";
 import axios, { AxiosError } from "axios";
 import { Notyf } from "notyf";
 import { useRouter } from "next/navigation";
-import { useLoading } from "@/utils/loading/loadingContext";
+import { useLoading } from "@/app/contexts/loading/loadingContext";
 
 interface ConfirmSignupProps {
   email: string;
