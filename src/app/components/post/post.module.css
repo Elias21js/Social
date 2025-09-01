@@ -72,6 +72,42 @@
     row-gap: 1rem;
     width: 100%;
     height: max-content;
+
+    & .post_config {
+      display: flex;
+      flex-flow: column nowrap;
+      row-gap: 1rem;
+
+      & .file_i {
+        display: block;
+        width: 100%;
+        padding: 0.5rem 1rem;
+        border: 1px solid rgb(var(--purple-secondary-a), 50%);
+        border-radius: 12px;
+        background-color: var(--background); /* escuro do site */
+        font-size: 0.9rem;
+        color: var(--foreground);
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+
+        &::file-selector-button {
+          display: none;
+          /* border: none;
+          padding: 0.4rem 1rem;
+          margin-right: 0.5rem;
+          background-color: #6c63ff;
+          color: #fff;
+          border-radius: 10px;
+          cursor: pointer;
+          font-weight: bold;
+          transition: background-color 0.2s; */
+
+          &:hover {
+            background-color: #5848c2;
+          }
+        }
+      }
+    }
   }
 
   & .url_i {
@@ -91,35 +127,6 @@
 
     &:focus {
       border: 2px solid var(--purple-primary);
-    }
-  }
-
-  & .file_i {
-    display: block;
-    width: 100%;
-    padding: 0.5rem 1rem;
-    border: 1px solid rgb(var(--purple-secondary-a), 50%);
-    border-radius: 12px;
-    background-color: var(--background); /* escuro do site */
-    color: var(--foreground);
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-
-    &::file-selector-button {
-      border: none;
-      padding: 0.4rem 1rem;
-      margin-right: 0.5rem;
-      background-color: #6c63ff;
-      color: #fff;
-      border-radius: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background-color 0.2s;
-
-      &:hover {
-        background-color: #5848c2;
-      }
     }
   }
 }

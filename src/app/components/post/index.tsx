@@ -79,18 +79,21 @@ export function Post() {
             name="post_content"
             id="post_content"
             spellCheck={false}
-            placeholder="O que você está pensando?"
+            placeholder="Conteúdo do Post"
           />
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileRef}
-            className={style.file_i}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              if (e.target.files && e.target.files[0]) setFile(e.target.files[0]);
-            }}
-          />
-          <KeywordsInput ref={keywordsRef} onChange={setKeywords} />
+          <div className={style.post_config}>
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileRef}
+              className={style.file_i}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                if (e.target.files && e.target.files[0]) setFile(e.target.files[0]);
+              }}
+            />
+
+            <KeywordsInput ref={keywordsRef} onChange={setKeywords} />
+          </div>
           <div className={style.p_s}>
             <Button onClick={reset}>
               <ImageIcon size={18} />
