@@ -15,30 +15,21 @@ import { useUser } from "@/app/contexts/UserContext";
 
 export function Post() {
   const keywordsRef = useRef<KeywordsInputHandle>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
   const notyf = useNotyf();
   const { user } = useUser();
 
   const [content, setContent] = useState("");
-  // const [imageURL, setImageURL] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [keywords, setKeywords] = useState<string[]>([]);
   const [txtCount, setTxtCount] = useState(0);
   const [spinning, setSpinning] = useState(false);
-  // const [imgValid, setImgValid] = useState(true);
-
-  // const isValidImage = (url: string) => /\.(jpeg|jpg|gif|png|webp)$/i.test(url);
 
   const reset = () => {
     setContent("");
-    // setImageURL("");
     setTxtCount(0);
+    if (fileRef.current) fileRef.current.value = "";
     keywordsRef.current?.reset();
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
-    }
   };
 
   const handleNewPost = async () => {
@@ -90,31 +81,16 @@ export function Post() {
             spellCheck={false}
             placeholder="O que você está pensando?"
           />
-
-          <input type="file" accept="image/*" className={style.file_i} onChange={handleFileChange} />
-
-          {/* <input
-            className={style.url_i}
-            type="text"
-            value={imageURL}
-            onChange={(e) => {
-              setImageURL(e.target.value);
-              setImgValid(true);
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileRef}
+            className={style.file_i}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              if (e.target.files && e.target.files[0]) setFile(e.target.files[0]);
             }}
-            placeholder="URL da imagem (opcional)"
-            name="url"
-            id="url"
-            autoComplete="off"
           />
-
-          {imageURL.trim() && isValidImage(imageURL) && imgValid && (
-            <div className={style.preview_image}>
-              <img src={imageURL} alt="Preview da URL" onError={() => setImgValid(false)} />
-            </div>
-          )} */}
-
           <KeywordsInput ref={keywordsRef} onChange={setKeywords} />
-
           <div className={style.p_s}>
             <Button onClick={reset}>
               <ImageIcon size={18} />

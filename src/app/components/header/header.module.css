@@ -8,6 +8,7 @@
   background-color: var(--header-bg);
   border-bottom: 1px solid rgba(var(--foreground-a), 0.2);
   user-select: none;
+  z-index: 99;
 
   @media screen and (max-width: 865px) {
     padding: 1.2rem 1rem;

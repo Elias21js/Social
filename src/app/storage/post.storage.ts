@@ -17,5 +17,5 @@ export const uploadFile = async (file: File) => {
   const {
     data: { publicUrl },
   } = supabase.storage.from("posts-images").getPublicUrl(filePath);
-  return publicUrl;
+  return { publicUrl, filePath };
 };

@@ -33,6 +33,7 @@
     flex-flow: row nowrap;
     align-items: center;
     justify-content: space-between;
+    position: relative;
 
     & .post_info {
       display: flex;
