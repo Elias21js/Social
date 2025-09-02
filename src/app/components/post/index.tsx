@@ -12,12 +12,16 @@ import { getErrorMessage } from "@/utils/error/errorCatch";
 import { handleAddPost } from "@/app/controllers/postController";
 import { mutate } from "swr";
 import { useUser } from "@/app/contexts/UserContext";
+import { Post as PostType } from "../feed/feedClient";
+import { useProfile } from "@/app/hooks/useProfile";
 
 export function Post() {
   const keywordsRef = useRef<KeywordsInputHandle>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const notyf = useNotyf();
   const { user } = useUser();
+  const { profile } = useProfile(user?.id!);
+  console.log(profile);
 
   const [content, setContent] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -34,11 +38,25 @@ export function Post() {
 
   const handleNewPost = async () => {
     try {
-      const success = await handleAddPost({ content, imageFile: file, keywords });
+      const success = await handleAddPost({ user_id: user?.id, content, imageFile: file, keywords });
       if (success) {
         notyf?.success("Post adicionado com sucesso.");
         reset();
-        mutate("/posts");
+
+        const tempPost: PostType = {
+          post_id: "temp-" + Date.now(),
+          user_id: user?.id ?? "unknown",
+          user_name: user?.name ?? "Você",
+          user_email: user?.email ?? "desconhecido",
+          user_avatar: profile?.avatar ?? null,
+          content,
+          image: file ? URL.createObjectURL(file) : "", // transforma File em URL temporária
+          created_at: new Date(),
+          updated_at: null,
+          keywords,
+        };
+
+        mutate("/posts", (postsAtual?: PostType[]) => [tempPost, ...(postsAtual ?? [])], false);
       } else notyf?.error("Ocorreu um erro interno");
     } catch (err) {
       console.error(err);
@@ -64,7 +82,7 @@ export function Post() {
 
       <section className={style.p}>
         <div className={style.f_left}>
-          <Image src={user?.avatar ?? avatar} alt="avatar-icon" width={52} height={52} className={style.avatar} />
+          <Image src={profile?.avatar ?? avatar} alt="avatar-icon" width={64} height={64} className={style.avatar} />
         </div>
 
         <div className={style.f_right}>

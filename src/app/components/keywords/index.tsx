@@ -63,7 +63,7 @@ const KeywordsInput = forwardRef<KeywordsInputHandle, KeywordsInputProps>(({ onC
       <input
         ref={inputRef}
         className={style.input}
-        placeholder="Palavras-chave"
+        placeholder={tags.length === 0 && inputValue === "" ? "Palavras-chave" : ""}
         value={inputValue}
         onChange={handleChange}
         onKeyDown={handleKeyDown}

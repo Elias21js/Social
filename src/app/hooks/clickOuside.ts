@@ -3,19 +3,18 @@ import { useEffect } from "react";
 export function useClickOutside<T extends HTMLElement>(
   ref: React.RefObject<T | null>,
   callback: () => void,
-  ignoreRef?: React.RefObject<HTMLElement | null>
+  ignoreRefs?: Array<React.RefObject<HTMLElement | null> | undefined>
 ) {
   useEffect(() => {
-    function handleClick(event: MouseEvent) {
-      if (
-        ref.current &&
-        !ref.current.contains(event.target as Node) &&
-        !(ignoreRef?.current && ignoreRef.current.contains(event.target as Node))
-      ) {
-        callback();
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [ref, callback, ignoreRef]);
+    const handler = (event: MouseEvent) => {
+      if (!ref.current) return;
+      if (ref.current.contains(event.target as Node)) return;
+      if (ignoreRefs?.some((r) => r?.current?.contains(event.target as Node))) return;
+
+      callback();
+    };
+
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [ref, callback, ignoreRefs]);
 }

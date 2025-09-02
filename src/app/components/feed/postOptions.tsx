@@ -24,17 +24,23 @@ export function PostPopup({
   postOwnerId: string;
 }) {
   const ref = useRef<HTMLDivElement | null>(null);
-  useClickOutside(ref, () => setStateMenu(), ignoreRef);
+  useClickOutside(ref, () => setStateMenu(), [ignoreRef]);
   const notyf = useNotyf();
 
   const onDelete = async () => {
     setStateMenu();
+
     try {
       const success = await handleDeletePost({ postId, postOwnerId });
 
       if (success) notyf?.success("Post deletado.");
       mutate("/posts");
     } catch (err) {
+      const message = (err as any)?.response?.data?.err?.message ?? (err as Error).message ?? "Erro desconhecido";
+
+      if (message.includes('"temp-')) {
+        return notyf?.error("Espere alguns segundos antes de deletar o post.");
+      }
       notyf?.error(getErrorMessage(err));
       console.error(err);
     }

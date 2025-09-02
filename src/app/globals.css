@@ -70,3 +70,30 @@ a {
 .notyf {
   z-index: 9999 !important; /* todos os toasts ficarão na frente */
 }
+
+.notyf__toast {
+  width: fit-content !important; /* se max-content não pegou, fit-content resolve */
+  max-width: none !important; /* remove limite */
+  white-space: nowrap !important; /* não quebra linha */
+  display: inline-flex !important; /* ajusta o container */
+  align-items: center !important;
+  border-radius: 1rem;
+  padding: 0.5rem 1rem !important;
+}
+
+.notyf__wrapper {
+  display: inline-flex !important;
+  align-items: center !important;
+  border-radius: 1rem;
+  gap: 0.5rem !important;
+  white-space: nowrap !important;
+}
+
+.notyf__ripple {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 1rem !important;
+  top: 0 !important;
+  left: 0 !important;
+  transform: none !important;
+}

@@ -1,15 +1,17 @@
 import axios from "axios";
 import { uploadFile } from "../storage/post.storage";
+import { mutate } from "swr";
 export interface postBody {
+  user_id: string | undefined;
   content: string | null;
   imageFile: File | null;
   keywords: string[] | null;
 }
 
-export async function handleAddPost({ content, imageFile, keywords }: postBody) {
+export async function handleAddPost({ user_id, content, imageFile, keywords }: postBody) {
   let imageUrl: { publicUrl: string; filePath: string } | null;
   if (imageFile) {
-    imageUrl = await uploadFile(imageFile);
+    imageUrl = await uploadFile(imageFile, user_id);
   } else {
     imageUrl = null;
   }

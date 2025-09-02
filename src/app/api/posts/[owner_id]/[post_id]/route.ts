@@ -35,14 +35,16 @@ export async function DELETE(req: NextRequest, context: { params: { owner_id?: s
       return NextResponse.json({ success: false, err: fetchError }, { status: 400 });
     }
 
-    let image_path = post.image_path;
-    if (image_path.startsWith("/")) image_path = image_path.slice(1);
+    if (post.image_path !== null) {
+      let image_path = post.image_path;
+      if (image_path.startsWith("/")) image_path = image_path.slice(1);
 
-    if (image_path) {
-      // deleta a imagem do storage
-      const { error: storageError, data } = await supabase.storage.from("posts-images").remove([image_path]);
-      if (storageError) {
-        return NextResponse.json({ success: false, err: storageError }, { status: 400 });
+      if (image_path) {
+        // deleta a imagem do storage
+        const { error: storageError, data } = await supabase.storage.from("posts-images").remove([image_path]);
+        if (storageError) {
+          return NextResponse.json({ success: false, err: storageError }, { status: 400 });
+        }
       }
     }
 

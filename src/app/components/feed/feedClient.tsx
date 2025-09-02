@@ -3,6 +3,7 @@
 import useSWR from "swr"; // SWR: fetch + cache inteligente
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import "dayjs/locale/pt-br";
 import style from "./feed.module.css";
 import Image from "next/image";
 import avatar from "@/app/assets/avatar.svg";
@@ -12,6 +13,8 @@ import PostSkeleton from "./skelet";
 import { PostPopup } from "./postOptions";
 import { useUser } from "@/app/contexts/UserContext";
 import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import ResponsiveImage from "@/utils/responsiveImages/responsiveImage";
 
 dayjs.locale("pt-br");
 dayjs.extend(relativeTime);
@@ -23,17 +26,17 @@ const fetcher = async () => {
 };
 
 // Interface Post
-interface Post {
-  user_id: string;
-  user_name: string;
-  user_email: string;
-  user_avatar: null;
-  post_id: string;
-  content: string;
-  image: string;
-  created_at: Date;
-  updated_at: null;
-  keywords: string[];
+export interface Post {
+  user_id?: string;
+  user_name?: string;
+  user_email?: string;
+  user_avatar?: string | null;
+  post_id?: string;
+  content?: string;
+  image?: string;
+  created_at?: Date;
+  updated_at?: null;
+  keywords?: string[];
 }
 
 // Props do feed client
@@ -44,6 +47,7 @@ interface FeedClientProps {
 export default function FeedClient({ initialPosts }: FeedClientProps) {
   const [stateMenu, setStateMenu] = useState<string | null>(null);
   const buttonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const router = useRouter();
 
   const { user } = useUser();
   // 1️⃣ SWR para buscar posts, inicializamos com SSR
@@ -54,7 +58,7 @@ export default function FeedClient({ initialPosts }: FeedClientProps) {
   } = useSWR<Post[]>("/posts", fetcher, {
     fallbackData: initialPosts, // posts iniciais do server-side
     revalidateOnFocus: false, // não faz fetch toda vez que a aba volta
-    refreshInterval: 60000, // atualiza a cada 10s automaticamente
+    refreshInterval: 60000, // atualiza a cada 60s automaticamente
   });
 
   // 2️⃣ Função para adicionar post instantaneamente no topo
@@ -78,23 +82,32 @@ export default function FeedClient({ initialPosts }: FeedClientProps) {
   return (
     <>
       {posts.map(
-        ({ post_id, content, user_avatar, user_name, user_email, created_at, image, user_id: post_owner_id }) => {
+        (
+          { post_id, content, user_avatar, user_name, user_email, created_at, image, user_id: post_owner_id },
+          index
+        ) => {
           return (
             <section key={post_id} className={style.f}>
               <div className={style.post_sec}>
                 <div className={style.post_info}>
-                  <div className={style.avatar_sec}>
+                  <div
+                    className={style.avatar_sec}
+                    onClick={() => {
+                      console.log(post_owner_id);
+                      router.push(`/perfil/${post_owner_id}`);
+                    }}
+                  >
                     <Image
                       src={user_avatar ?? avatar}
                       alt="avatar-icon"
-                      width={52}
-                      height={52}
+                      width={64}
+                      height={64}
                       className={style.avatar}
                     />
                   </div>
                   <div className={style.author_sec}>
                     <span className={style.author_title}>{user_name}</span>
-                    <span className={style.author_arroba}>{user_email.split("@")[0]}</span>
+                    <span className={style.author_arroba}>{user_email!.split("@")[0]}</span>
                   </div>
                   <div className={style.author_posted}>
                     <span>{dayjs(created_at).fromNow()}</span>
@@ -102,9 +115,9 @@ export default function FeedClient({ initialPosts }: FeedClientProps) {
                 </div>
                 <Button
                   ref={(el) => {
-                    buttonRefs.current[post_id] = el;
+                    buttonRefs.current[post_id!] = el;
                   }}
-                  onClick={() => openConfig(post_id)}
+                  onClick={() => openConfig(post_id!)}
                 >
                   <Ellipsis size="18" />
                 </Button>
@@ -115,7 +128,7 @@ export default function FeedClient({ initialPosts }: FeedClientProps) {
                       setStateMenu={() => setStateMenu(null)}
                       ignoreRef={{ current: buttonRefs.current[post_id] }}
                       postId={post_id}
-                      postOwnerId={post_owner_id}
+                      postOwnerId={post_owner_id!}
                     />
                   </>
                 )}
@@ -125,7 +138,15 @@ export default function FeedClient({ initialPosts }: FeedClientProps) {
                 <p>{content}</p>
               </div>
 
-              <div className={style.post_image}>{image?.length > 0 && <img src={image} alt="post_image" />}</div>
+              {image?.length! > 0 && (
+                <ResponsiveImage
+                  key={image}
+                  src={image!}
+                  alt="post-image"
+                  sizes="(max-width: 640px) 590px, 590px"
+                  priority={index === 0}
+                />
+              )}
 
               <div className={style.actions}>
                 <Button className={style.like}>

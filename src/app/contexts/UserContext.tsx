@@ -7,8 +7,8 @@ import { createClient } from "@/utils/supabaseClient/client";
 const supabase = createClient();
 
 // Interface do usuário que vamos disponibilizar
-interface UserProfile {
-  id: string; // ID do Auth
+export interface UserProfile {
+  id?: string; // ID do Auth
   email?: string; // email do Auth
   name?: string; // do profile
   avatar?: string; // do profile
@@ -77,8 +77,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
+  if (!user) return;
   return <UserContext.Provider value={{ user, loading, refreshUser: fetchUser }}>{children}</UserContext.Provider>;
 }
 
-// Hook de consumo
+// Hook de consumow
 export const useUser = () => useContext(UserContext);

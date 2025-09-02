@@ -2,9 +2,9 @@ import { createClient } from "@/utils/supabaseClient/client";
 
 const supabase = createClient();
 
-export const uploadFile = async (file: File) => {
+export const uploadFile = async (file: File, user_id: string | undefined) => {
   const fileExt = file.name.split(".").pop();
-  const fileName = `${Date.now()}.${fileExt}`;
+  const fileName = `${user_id}.${fileExt}`;
   const filePath = `/${fileName}`; // pasta dentro do bucket
 
   const { data, error } = await supabase.storage

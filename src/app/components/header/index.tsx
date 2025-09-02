@@ -31,7 +31,7 @@ export function Header() {
       if (success) {
         notyf?.success("Deslogado com sucesso.");
 
-        router.push("/auth");
+        router.replace("/auth");
         setTimeout(() => setLoading(false), 500);
       }
     } catch (err: unknown) {
@@ -57,8 +57,8 @@ export function Header() {
               </Button>
             </Link>
 
-            <Link href="/perfil" className={style.link}>
-              <Button selected={pathname === "/perfil" && true} className={style.b_t}>
+            <Link href="/perfil/me" className={style.link}>
+              <Button selected={pathname === "/perfil/me" && true} className={style.b_t}>
                 <UserIcon size="18" />
                 Perfil
               </Button>
