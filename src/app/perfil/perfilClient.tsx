@@ -63,7 +63,13 @@ export default function Perfil({ initialData }: Perfil) {
     <section className={style.perfil}>
       <div className={style.card}>
         <div className={style.banner} ref={bannerRef} onClick={(e) => handleMenu("banner", e)}>
-          <Image src={banner ?? default_banner} fill alt="user_banner" sizes="(max-width: 768px) 100vw, 660px" />
+          <Image
+            src={banner ?? default_banner}
+            fill
+            alt="user_banner"
+            priority
+            sizes="(max-width: 768px) 100vw, 660px"
+          />
           {stateMenu === "banner" && (
             <>
               <Menu

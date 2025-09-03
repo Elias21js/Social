@@ -92,7 +92,6 @@
         font-size: 0.9rem;
         color: var(--foreground);
         cursor: pointer;
-        transition: all 0.2s ease-in-out;
 
         &::file-selector-button {
           display: none;
