@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "notyf/notyf.min.css";
 import { HeaderWrapper } from "./components/header/HeaderWrapper";
-import { LoadingProvider } from "@/app/contexts/loading/loadingContext";
 import { UserProvider } from "./contexts/UserContext";
+import { Perfil, PostProvider } from "./contexts/PostContext";
+import { getAllPosts } from "./models/posts.model";
+import { Post } from "./components/feed/Feed";
+import { getUser } from "./controllers/userController";
 
 export const metadata: Metadata = {
   title: "Social • Sua Rede Privada",
@@ -34,16 +37,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const initialPosts: Post[] = await getAllPosts();
+  const initialProfile: Perfil = await getUser();
+
   return (
     <html lang="pt-br">
       <body>
-        <LoadingProvider>
-          <UserProvider>
+        <UserProvider>
+          <PostProvider initialPosts={initialPosts} initialProfile={initialProfile}>
             <HeaderWrapper />
             <main>{children}</main>
-          </UserProvider>
-        </LoadingProvider>
+          </PostProvider>
+        </UserProvider>
       </body>
     </html>
   );

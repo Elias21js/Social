@@ -41,9 +41,9 @@ export async function getUser() {
     const { id, email, created_at, user_metadata } = user;
     const { name } = user_metadata;
 
-    const { avatar, banner, username } = await getProfileById(id);
+    const { avatar, banner, username, avatar_path, banner_path } = await getProfileById(id);
 
-    return { user_id: id, name, email, avatar, banner, username, created_at };
+    return { user_id: id, name, email, avatar, avatar_path, banner, banner_path, username, created_at, isOwner: true };
   } catch (err) {
     throw err;
   }

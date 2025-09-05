@@ -34,7 +34,7 @@ export function PostPopup({
       const success = await handleDeletePost({ postId, postOwnerId });
 
       if (success) notyf?.success("Post deletado.");
-      mutate("/posts");
+      mutate("/api/posts");
     } catch (err) {
       const message = (err as any)?.response?.data?.err?.message ?? (err as Error).message ?? "Erro desconhecido";
 

@@ -8,11 +8,9 @@ import { RegisterResponse } from "@/utils/interfaces/interfaces";
 import { useRouter } from "next/navigation";
 import { useNotyf } from "@/utils/toast/notyf";
 import { getErrorMessage } from "@/utils/error/errorCatch";
-import { useLoading } from "@/app/contexts/loading/loadingContext";
 import { useUser } from "../contexts/UserContext";
 
 export default function Auth() {
-  const { setLoading } = useLoading();
   const { refreshUser } = useUser();
   const notyf = useNotyf();
   const router = useRouter();
@@ -34,7 +32,6 @@ export default function Auth() {
 
     if (submited === "register") {
       try {
-        setLoading(true);
         const { data } = await axios.post<RegisterResponse>(process.env.NEXT_PUBLIC_API_URL + "/register", {
           name: form.name,
           email: form.email,
@@ -43,17 +40,14 @@ export default function Auth() {
 
         if (data.success) {
           notyf?.success("Usuário registrado com sucesso.");
-          setLoading(false);
           return setRegistered(true);
         }
       } catch (err: unknown) {
         notyf?.error(getErrorMessage(err));
-        setLoading(false);
         return setRegistered(false);
       }
     } else if (submited === "login") {
       try {
-        setLoading(true);
         const {
           data: { success },
         } = await axios.post<RegisterResponse>(process.env.NEXT_PUBLIC_API_URL + "/login", {
@@ -65,21 +59,17 @@ export default function Auth() {
           notyf?.success("Logado com sucesso.");
           router.push("/");
           await refreshUser();
-          setTimeout(() => setLoading(false), 500);
         }
       } catch (err: unknown) {
         if (getErrorMessage(err) === "Email not confirmed") {
           try {
             await axios.post(process.env.NEXT_PUBLIC_API_URL + "/login-otp", { email: form.email });
             notyf?.success("Confirme no seu e-mail para efetuar o login.");
-            setLoading(false);
             return setRegistered(true);
           } catch (err) {
-            setLoading(false);
             notyf?.error(getErrorMessage(err));
           }
         } else {
-          setLoading(false);
           notyf?.error(getErrorMessage(err));
         }
       }

@@ -8,10 +8,13 @@ import Image from "next/image";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/pt-br";
-import useSWR from "swr";
-import { useRef, useState } from "react";
+import useSWR, { mutate } from "swr";
+import { useEffect, useRef, useState } from "react";
 import { Menu } from "../components/menu";
-import { useUser } from "../contexts/UserContext";
+import clsx from "clsx";
+import axios from "axios";
+import { Post } from "../components/feed/Feed";
+import { PerfilSkelet } from "../skeletons/perfil/PerfilSkelet";
 
 dayjs.locale("pt-br");
 dayjs.extend(relativeTime);
@@ -23,22 +26,53 @@ export interface Perfil {
     username: string | null;
     email: string | undefined;
     avatar: string | null;
+    avatar_path: string | null;
     banner: string | null;
+    banner_path: string | null;
     created_at: string;
+    isOwner: boolean;
   };
 }
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function Perfil({ initialData }: Perfil) {
-  const { user } = useUser();
-  const { data: profile } = useSWR(`/api/users/${initialData.user_id}`, fetcher, { fallbackData: initialData });
+  const {
+    data: profile,
+    mutate: mutate_profile,
+    isLoading,
+  } = useSWR(`/api/users/${initialData.user_id}`, fetcher, {
+    fallbackData: initialData,
+    revalidateOnFocus: false,
+    refreshInterval: 120000,
+  });
   const [stateMenu, setStateMenu] = useState<string | null>(null);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
+  const [showItemMenu, setShowItemMenu] = useState<"posts" | "followers" | "following">("posts");
+  const [userPosts, setUserPosts] = useState<Post[] | []>([]);
+  const [userFollowers, setUserFollowers] = useState<number>(0);
+  const [userFollowing, setUserFollowing] = useState<number>(0);
 
   const avatarRef = useRef<HTMLDivElement | null>(null);
   const bannerRef = useRef<HTMLDivElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const getPost = async () => {
+      const params = new URLSearchParams({
+        user_id: initialData.user_id,
+        filter: "true",
+      });
+
+      const { data } = await axios.get<Post[]>(process.env.NEXT_PUBLIC_API_URL + "/posts?" + params.toString());
+
+      setUserPosts(data);
+    };
+
+    getPost();
+  }, []);
+
+  if (isLoading) return <PerfilSkelet />;
 
   const { name, email, avatar, banner, created_at } = profile!;
   const dataCadastro = dayjs(created_at);
@@ -59,6 +93,10 @@ export default function Perfil({ initialData }: Perfil) {
     setStateMenu((prev) => (prev === action ? null : action));
   }
 
+  async function handleGetMenu(itemMenu: "posts" | "followers" | "following") {
+    setShowItemMenu(itemMenu);
+  }
+
   return (
     <section className={style.perfil}>
       <div className={style.card}>
@@ -76,11 +114,12 @@ export default function Perfil({ initialData }: Perfil) {
                 ref={menuRef}
                 key={menuPosition?.x ?? stateMenu}
                 ignoreRef={[bannerRef]}
-                perfilOwner={user?.id === profile.user_id}
+                perfilOwner={profile.isOwner}
                 state={stateMenu}
                 setStateMenu={() => setStateMenu(null)}
                 position={menuPosition}
                 user={profile}
+                mutate_profile={mutate_profile}
               />
             </>
           )}
@@ -95,11 +134,12 @@ export default function Perfil({ initialData }: Perfil) {
                     ref={menuRef}
                     key={stateMenu}
                     ignoreRef={[avatarRef]}
-                    perfilOwner={user?.id === profile.user_id}
+                    perfilOwner={profile.isOwner}
                     state={stateMenu}
                     setStateMenu={() => setStateMenu(null)}
                     position={menuPosition}
                     user={profile}
+                    mutate_profile={mutate_profile}
                   />
                 </>
               )}
@@ -120,21 +160,40 @@ export default function Perfil({ initialData }: Perfil) {
           </div>
           <div className={style.card_menu}>
             <div>
-              <span>{0}</span>
+              <span>{userPosts.length}</span>
               <span>Posts</span>
             </div>
             <div>
-              <span>{0}</span>
+              <span>{userFollowers}</span>
               <span>Seguidores</span>
             </div>
             <div>
-              <span>{0}</span>
+              <span>{userFollowing}</span>
               <span>Seguindo</span>
             </div>
           </div>
         </div>
       </div>
-      <div className={style.list_menu}></div>
+      <div className={style.list_menu}>
+        <div
+          className={clsx(style.menu_item, showItemMenu === "posts" ? style.active : "")}
+          onClick={() => handleGetMenu("posts")}
+        >
+          Posts ({userPosts.length})
+        </div>
+        <div
+          className={clsx(style.menu_item, showItemMenu === "followers" ? style.active : "")}
+          onClick={() => handleGetMenu("followers")}
+        >
+          Seguidores (0)
+        </div>
+        <div
+          className={clsx(style.menu_item, showItemMenu === "following" ? style.active : "")}
+          onClick={() => handleGetMenu("following")}
+        >
+          Seguindo (0)
+        </div>
+      </div>
     </section>
   );
 }

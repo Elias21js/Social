@@ -11,11 +11,9 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useNotyf } from "@/utils/toast/notyf";
 import { getErrorMessage } from "@/utils/error/errorCatch";
-import { useLoading } from "@/app/contexts/loading/loadingContext";
 import { useUser } from "@/app/contexts/UserContext";
 
 export function Header() {
-  const { setLoading } = useLoading();
   const { user } = useUser();
   const router = useRouter();
   const pathname = usePathname();
@@ -23,7 +21,6 @@ export function Header() {
 
   const handleLogOut = async () => {
     try {
-      setLoading(true);
       const {
         data: { success },
       } = await axios.post(process.env.NEXT_PUBLIC_API_URL + "/logout");
@@ -32,11 +29,9 @@ export function Header() {
         notyf?.success("Deslogado com sucesso.");
 
         router.replace("/auth");
-        setTimeout(() => setLoading(false), 500);
       }
     } catch (err: unknown) {
       console.error(err);
-      setLoading(false);
 
       notyf?.error(getErrorMessage(err));
     }

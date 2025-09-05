@@ -10,18 +10,14 @@ import KeywordsInput, { KeywordsInputHandle } from "../keywords";
 import { useNotyf } from "@/utils/toast/notyf";
 import { getErrorMessage } from "@/utils/error/errorCatch";
 import { handleAddPost } from "@/app/controllers/postController";
-import { mutate } from "swr";
-import { useUser } from "@/app/contexts/UserContext";
 import { Post as PostType } from "../feed/feedClient";
-import { useProfile } from "@/app/hooks/useProfile";
+import { usePosts } from "@/app/contexts/PostContext";
 
 export function Post() {
   const keywordsRef = useRef<KeywordsInputHandle>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const notyf = useNotyf();
-  const { user } = useUser();
-  const { profile } = useProfile(user?.id!);
-  console.log(profile);
+  const { profile, mutate_posts } = usePosts();
 
   const [content, setContent] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -38,16 +34,16 @@ export function Post() {
 
   const handleNewPost = async () => {
     try {
-      const success = await handleAddPost({ user_id: user?.id, content, imageFile: file, keywords });
+      const success = await handleAddPost({ user_id: profile?.user_id, content, imageFile: file, keywords });
       if (success) {
         notyf?.success("Post adicionado com sucesso.");
         reset();
 
         const tempPost: PostType = {
           post_id: "temp-" + Date.now(),
-          user_id: user?.id ?? "unknown",
-          user_name: user?.name ?? "Você",
-          user_email: user?.email ?? "desconhecido",
+          user_id: profile?.user_id ?? "unknown",
+          user_name: profile?.name ?? "Você",
+          user_email: profile?.email ?? "desconhecido",
           user_avatar: profile?.avatar ?? null,
           content,
           image: file ? URL.createObjectURL(file) : "", // transforma File em URL temporária
@@ -56,7 +52,7 @@ export function Post() {
           keywords,
         };
 
-        mutate("/posts", (postsAtual?: PostType[]) => [tempPost, ...(postsAtual ?? [])], false);
+        mutate_posts((postsAtual?: PostType[]) => [tempPost, ...(postsAtual ?? [])]);
       } else notyf?.error("Ocorreu um erro interno");
     } catch (err) {
       console.error(err);
@@ -66,7 +62,7 @@ export function Post() {
 
   const handleRefresh = async () => {
     setSpinning(true);
-    await mutate("/posts");
+    await mutate_posts();
     setSpinning(false);
   };
 
@@ -74,6 +70,7 @@ export function Post() {
     <>
       <div className={style.f_t}>
         <span>Feed</span>
+
         <button className={style.r} onClick={handleRefresh}>
           <RefreshCw className={spinning ? style.spin : ""} />
           Atualizar
@@ -82,7 +79,14 @@ export function Post() {
 
       <section className={style.p}>
         <div className={style.f_left}>
-          <Image src={profile?.avatar ?? avatar} alt="avatar-icon" width={64} height={64} className={style.avatar} />
+          <Image
+            src={profile?.avatar ?? avatar}
+            alt="avatar-icon"
+            width={64}
+            height={64}
+            className={style.avatar}
+            priority
+          />
         </div>
 
         <div className={style.f_right}>

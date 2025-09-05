@@ -1,0 +1,96 @@
+.loader_wrapper {
+  position: fixed;
+  display: flex;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(20px);
+  z-index: 99999;
+  user-select: none;
+
+  opacity: 0; /* começa invisível */
+  transform: scale(0.98); /* leve shrink inicial */
+  animation: fadeIn 0.5s forwards;
+}
+
+.loader_wrapper.fade-out {
+  animation: fadeOut 0.5s forwards;
+}
+
+/* fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* fade out */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+}
+
+.loader_container {
+  border: 1px solid rgba(var(--foreground-a), 0.2);
+  padding: 1.5rem;
+  background-color: var(--header-bg);
+  border-radius: 1rem;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  row-gap: 1rem;
+
+  width: clamp(250px, 50vw, 450px);
+  height: max-content;
+  z-index: 100000;
+}
+
+.loader {
+  width: 72px;
+  height: 72px;
+  margin-top: 1rem;
+  border: 8px solid rgba(187, 134, 252, 0.2);
+  border-top-color: #bb86fc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite, glow 1.5s ease-in-out infinite alternate;
+}
+
+.logo {
+  h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #bb86fc;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px #bb86fc;
+  }
+  to {
+    box-shadow: 0 0 20px #bb86fc;
+  }
+}

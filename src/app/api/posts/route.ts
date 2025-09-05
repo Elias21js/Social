@@ -1,8 +1,12 @@
 import { addPost, getAllPosts } from "@/app/models/posts.model";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
-  const posts = await getAllPosts(); // pega todos os posts do DB
+export async function GET(req: NextRequest) {
+  const user_id = req.headers.get("x-user-id");
+  const url = new URL(req.url);
+  const filter = url.searchParams.get("filter"); // "true" ou null
+  const param_id = url.searchParams.get("user_id"); // "true" ou null
+  const posts = await getAllPosts(10, param_id ?? user_id, filter); // pega todos os posts do DB
   return NextResponse.json(posts);
 }
 

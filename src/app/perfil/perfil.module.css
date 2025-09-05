@@ -1,5 +1,7 @@
 .perfil {
   display: flex;
+  flex-flow: column nowrap;
+  row-gap: 4rem;
   margin: 0 auto;
   padding: 2rem;
   padding-top: 8rem;
@@ -137,6 +139,28 @@
             font-size: 0.9rem;
           }
         }
+      }
+    }
+  }
+
+  .list_menu {
+    display: flex;
+    border-bottom: 1px solid rgba(var(--foreground-a), 0.2);
+
+    & .menu_item {
+      cursor: pointer;
+      user-select: none;
+      padding: 1rem 2rem;
+      border-bottom: 2px solid transparent;
+      color: rgba(var(--foreground-a), 0.7);
+
+      &:hover {
+        color: var(--foreground);
+      }
+
+      &.active {
+        border-bottom: 2px solid var(--purple-secondary);
+        color: var(--purple-secondary);
       }
     }
   }

@@ -7,7 +7,6 @@ import { RefObject, useRef, useState } from "react";
 import { useClickOutside } from "@/app/hooks/clickOuside";
 import { useNotyf } from "@/utils/toast/notyf";
 import { getErrorMessage } from "@/utils/error/errorCatch";
-import { mutate } from "swr";
 import { removeAvatar, uploadAvatar } from "@/app/storage/avatar.storage";
 import { removeBanner, uploadBanner } from "@/app/storage/banner.storage";
 import {
@@ -17,6 +16,7 @@ import {
   handleUpdateBanner,
 } from "@/app/controllers/userController";
 import { CroppedImage } from "../cropImage";
+import { KeyedMutator } from "swr";
 //
 export function Menu({
   state,
@@ -26,6 +26,7 @@ export function Menu({
   position,
   ref,
   user,
+  mutate_profile,
 }: {
   state: "avatar" | "banner";
   perfilOwner: boolean;
@@ -44,6 +45,7 @@ export function Menu({
     banner_path: string | null;
     created_at: string;
   };
+  mutate_profile: KeyedMutator<string>;
 }) {
   useClickOutside(ref, () => setStateMenu(), ignoreRef);
   const [cropp, setCropp] = useState<File | null>(null);
@@ -69,7 +71,7 @@ export function Menu({
       const url = await uploaders[state](user.user_id, currentFile);
       await updaters[state](user.user_id, url);
 
-      mutate(`/api/users/${user.user_id}`);
+      mutate_profile();
       notyf?.success(`${state === "avatar" ? "Avatar" : "Banner"} atualizado com sucesso!`);
     } catch (err) {
       if (getErrorMessage(err).includes("maximum allowed size"))
@@ -98,7 +100,7 @@ export function Menu({
       if (!success) throw new Error("Não foi possível remover.");
       await databaseHandlers[state](user.user_id);
 
-      mutate(`/api/users/${user.user_id}`);
+      mutate_profile();
       notyf?.success(`${state === "avatar" ? "Avatar" : "Banner"} removido com sucesso!`);
     } catch (err) {
       notyf?.error(getErrorMessage(err));

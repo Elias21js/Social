@@ -35,4 +35,5 @@
   position: absolute;
   top: 85%;
   left: 81%;
+  z-index: 99999;
 }

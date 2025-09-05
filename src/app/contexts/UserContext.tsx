@@ -77,7 +77,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  if (!user) return;
   return <UserContext.Provider value={{ user, loading, refreshUser: fetchUser }}>{children}</UserContext.Provider>;
 }
 

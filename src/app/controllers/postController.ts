@@ -1,6 +1,5 @@
 import axios from "axios";
 import { uploadFile } from "../storage/post.storage";
-import { mutate } from "swr";
 export interface postBody {
   user_id: string | undefined;
   content: string | null;
